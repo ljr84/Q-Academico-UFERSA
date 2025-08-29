@@ -1,6 +1,0 @@
-flask==2.2.2
-Werkzeug==2.3.7
-sqlalchemy==1.4.32
-gunicorn
-flask_sqlalchemy==2.5.1
-pyjwt==1.7.1
