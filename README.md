@@ -15,8 +15,8 @@ CMD > python.exe -m pip install --upgrade pip
 
 Entre na pasta do projeto
 
-4 SuaPasta\Prototipo-Q-Academic-main>pip install -r requirements.txt
-5 SuaPasta\Prototipo-Q-Academic-main>python run.py
+- 4 SuaPasta\Prototipo-Q-Academic-main>pip install -r requirements.txt
+- 5 SuaPasta\Prototipo-Q-Academic-main>python run.py
 
 6 Running on localhost in to browser > http://127.0.0.1:50001
 
