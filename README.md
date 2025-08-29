@@ -2,7 +2,7 @@
 
 Uma aplicação WEB, utilizada como ferramenta educacional que possibilita o acesso a um banco de questões, no qual o professor de uma determinada disciplina disponibiliza um conjunto de questões, com gabarito, para que os alunos testem seus conhecimentos e aprendam com seus possíveis erros.
 
-- 
+# 
 
 A ferramenta Q-Acadêmico – UFERSA é uma aplicação WEB que visa possibilitar o acesso a um banco de questões por disciplina. O conteúdo utilizado é colaborativo e construtivo, no qual o professor de uma determinada disciplina disponibiliza um conjunto de questões, com gabarito, para que os alunos testem seus conhecimentos e aprendam com seus possíveis erros. O principal objetivo é fixar os conteúdos vistos em salas de aulas por meio de exercícios. 
 
@@ -20,6 +20,8 @@ Entre na pasta do projeto
 
 6 Running on localhost in to browser > http://127.0.0.1:50001
 
+
+# Demonstração de uso; 
 
 
 
