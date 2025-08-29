@@ -8,9 +8,9 @@ A ferramenta Q-Acadêmico – UFERSA é uma aplicação WEB que visa possibilita
 
 # Instruções para utilização do projeto ; 
 
-1 Download to Project 
-2 Download Python  
-3 Download PIP Install 
+- 1 Download to Project 
+- 2 Download Python  
+- 3 Download PIP Install 
 CMD > python.exe -m pip install --upgrade pip 
 
 Entre na pasta do projeto
