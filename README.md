@@ -25,5 +25,5 @@ Entre na pasta do projeto
 
 
 
-Contato para duvidas os sugestões: samara.nascimento@ufersa.edu.br
+Contato para duvidas os sugestões: samara.nascimento@ufersa.edu.br | 
                                    lerinaldojr@gmail.com 
