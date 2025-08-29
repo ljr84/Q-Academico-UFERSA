@@ -1,0 +1,96 @@
+{% set menu_id = "menu-materia-listar" %}
+
+
+{% set content_title = "Q-Acadêmico - UFERSA" %}
+{% extends "base/base.html" %}
+{% block title_page %}Q-Acadêmico - UFERSA{% endblock title_page %}
+
+
+
+{% block conteudo %}
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- Default box -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Cadastrar Nova Pergunta</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" onclick="history.back()" class="btn btn-tool">
+                                        <i class="fa fa-arrow-left"></i> Voltar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <!-- FORM ACTION -->
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="tx_question">Quest&atilde;o</label>
+                                            <input type="text" class="form-control" id="tx_question" name="tx_question" placeholder="2+2 eh 4">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="cb_validate">Informa&ccedil;&atilde;o</label>
+                                            <select class="form-control" id="cb_validate" name="cb_validate">
+                                                <option>Selecione</option>
+                                                <option value=1>Verdadeiro</option>
+                                                <option value=0>Falso</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                                <button type="button" id="btn_create" name="btn_create" class="btn btn-primary">Cadastrar</button>
+                            </div>
+                            <!-- /.card-footer-->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                </div>
+            </div>
+
+        </section>
+        <!-- /.content -->   
+    
+        {% endblock conteudo %}
+
+
+
+{% block renderjs %}
+<script>
+    
+var id_from_flask = {{ id|default("null") }};
+    function create_question(question, correct){
+        $.ajax({
+            type: "POST",
+            url: `/api/materia/assunto/${id_from_flask}/question/create`,
+            data: {
+                question: question,
+                correct: correct
+            },
+            success: function(e){
+                window.location.pathname = `/panel/materia/assunto/${id_from_flask}/edit`;
+            },
+            dataType: 'json'
+        })
+    };
+
+
+
+    $(document).on('click', '#btn_create', function(e){
+        e.preventDefault();
+        let question = $('#tx_question').val();
+        let correct = $("#cb_validate").val();
+        create_question(question, correct)
+    });
+
+</script>
+{% endblock renderjs %}

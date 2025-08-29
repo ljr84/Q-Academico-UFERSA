@@ -1,0 +1,138 @@
+{% set menu_id = "menu-admin-users" %}
+{% set content_title = "Q-Acadêmico - UFERSA" %}
+{% extends "base/base.html" %}
+{% block title_page %}Q-Acadêmico - UFERSA{% endblock title_page %}
+
+
+{% block conteudo %}
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- Default box -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Usu&aacute;rios:</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" onclick="history.back()" class="btn btn-tool">
+                                        <i class="fa fa-arrow-left"></i> Voltar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body table-responsive">
+                                <!-- TABLE USUARIOS -->
+                                <table class="table table-striped  " id="tb_users" name="tb_users">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome</th>
+                                            <th>E-mail</th>
+                                            <th>Ações</th>
+                                            
+											
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                                <button type="button" id="btn_new_user" name="btn_new_user" class="btn btn-primary">Novo Usu&aacute;rio</button>
+                            </div>
+                            <!-- /.card-footer-->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                </div>
+            </div>
+
+        </section>
+        <!-- /.content -->
+    {% endblock conteudo %}
+
+
+
+{% block renderjs %}
+<script>
+    console.log('hey there');
+    console.log('{{ bb }}');
+
+
+    function append_to_table2(element){
+        $('#tb_users tbody').append(`
+            <tr>
+                <td>${element.name}</td>
+                <td>${element.email}</td>
+
+                <td>
+                    <a class="btn btn-primary btn-sm" href="/panel/admin/user/${element.id}/view">
+                        <i class="fas fa-solid fa-eye"></i>
+                    </a>
+                    <a class="btn btn-info btn-sm" href="/panel/admin/user/${element.id}/edit">
+                        <i class="fas fa-pencil-alt"></i>
+                    </a>
+                    <a class="btn btn-danger btn-sm delete-user" data-descr="${element.id}" data-id="${element.id}" href="#">
+                        <i class="fas fa-trash"></i>
+                    </a>    
+                </td>
+            </tr>
+        `);
+    }
+
+    function append_to_table(element){
+        $('#tb_users tbody').append(`
+            <tr>
+                <td>${element.name}</td>
+                <td>${element.email}</td>
+
+                <td>
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        A&ccedil;&otilde;es
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="/panel/admin/user/${element.id}/view">Visualizar</a>
+                        <a class="dropdown-item" href="/panel/admin/user/${element.id}/edit">Editar</a>
+                        <a class="dropdown-item delete-user" data-descr="${element.id}" data-id="${element.id}" href="#">Deletar</a>
+                    </div>
+                </td>
+            </tr>
+        `);
+    }
+
+    
+
+
+    var token = localStorage.getItem('token');
+
+    function loadUsers(){
+        $.ajax({
+            type: "GET",
+            url: "/api/user/list",
+            headers: {
+                'Authorization': token
+            },
+            success: function(e, t, xhr){
+                e.data.forEach(element => {
+                    append_to_table(element)
+                })
+            },
+            dataType: 'json'
+        })
+    }
+
+    $(document).ready(function(){
+        add_bradcumb('Listar Usu&aacute;rios', '', true);
+        loadUsers();
+    });
+
+    $(document).on('click', '#btn_new_user', function(e){
+        e.preventDefault();
+        window.location.pathname = '/panel/admin/user/create';
+    });
+</script>
+
+{% endblock renderjs %}

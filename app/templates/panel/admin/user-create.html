@@ -1,0 +1,196 @@
+{% set menu_id = "menu-admin-users" %}
+
+
+{% set content_title = "Q-Acadêmico - UFERSA " %}
+{% extends "base/base.html" %}
+{% block title_page %}Q-Acadêmico - UFERSA{% endblock title_page %}
+
+
+{% block rendercss %}
+
+
+<!-- Theme toastr -->
+<link rel="stylesheet" href="https://adminlte.io/themes/v3/plugins/toastr/toastr.min.css">
+
+
+{% endblock rendercss %}
+
+
+{% block conteudo %}
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- Default box -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Criar Novo Usu&aacute;rio</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" onclick="history.back()" class="btn btn-tool">
+                                        <i class="fa fa-arrow-left"></i> Voltar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <!-- FORM ACTION -->
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="tx_username">Usu&aacute;rio</label>
+                                            <input type="text" class="form-control" id="tx_username" name="tx_username" placeholder="">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="tx_email">E-mail</label>
+                                            <input type="text" class="form-control" id="tx_email" name="tx_email" placeholder="">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="tx_name">Nome</label>
+                                            <input type="text" class="form-control" id="tx_name" name="tx_name" placeholder="">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="cb_group">Grupo</label>
+                                            <select class="form-control" id="cb_group" name="cb_group">
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="cb_status">Status</label>
+                                            <select class="form-control" id="cb_status" name="cb_status">
+                                                <option value="true">Ativo</option>
+                                                <option value="false">Inativo</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="tx_password">Senha</label>
+                                            <input type="password" class="form-control" id="tx_password" name="tx_password" placeholder="">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                                <button type="button" id="btn_create" name="btn_create" class="btn btn-primary">Criar</button>
+                            </div>
+                            <!-- /.card-footer-->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                </div>
+            </div>
+
+        </section>
+        <!-- /.content -->   
+    
+        {% endblock conteudo %}
+
+
+
+{% block renderjs %}
+<script>
+    
+
+var id_user = false;
+var token = localStorage.getItem('token');
+
+
+function load_user_groups(){
+    return $.ajax({
+        type: "GET",
+        url: '/api/user/group/list',
+        headers: {
+            'Authorization': token
+        },
+        success: function(e, t, xhr){
+            if(e.error === false){//cb_group
+                e.data.forEach(element => {
+                    $('#cb_group').append(`
+                        <option value="${element.key}">${element.description}</option>
+                    `);
+                })
+            }
+            return e;
+        },
+        dataType: 'json'
+    })
+}
+
+
+function handle_brandcumb(){
+    add_bradcumb('Listar Usu&aacute;rios', '/panel/admin/user/listar', false);
+    add_bradcumb(`Criar Novo`, '', true);
+}
+
+
+
+$(document).ready(function(){
+    handle_brandcumb()
+    load_user_groups()
+});
+
+
+
+
+
+
+
+
+    function create_user(name, email, username, group, status, password){
+        $.ajax({
+            type: "POST",
+            url: `/api/user/create`,
+            data: {
+                name: name,
+                email: email,
+                username: username,
+                group: group,
+                status: status,
+                password: password
+            },
+            headers: {
+                'Authorization': token
+            },
+            success: function(e){
+                window.location.pathname = `/panel/admin/user/listar`;
+            },
+            error: function(x, status, error){
+                notify_error(x.responseJSON.message);
+                // alert(`Opa! O sistema retornou erro ! -- ${status} -- ${x.responseJSON.message}`);
+            },
+            dataType: 'json'
+        })
+    };
+
+
+
+    $(document).on('click', '#btn_create', function(e){
+        e.preventDefault();
+        var name = $('#tx_name').val();
+        var email = $('#tx_email').val();
+        var username = $('#tx_username').val();
+        var group = $('#cb_group').val();
+        var status = $('#cb_status').val();
+        var password = $('#tx_password').val();
+        create_user(name, email, username, group, status, password);
+    });
+
+</script>
+{% endblock renderjs %}
+
+

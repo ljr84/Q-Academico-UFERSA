@@ -1,0 +1,125 @@
+{% set menu_id = "menu-materia-listar" %}
+
+
+{% set content_title = "BANCOVIEW-RASC1" %}
+{% extends "base/base.html" %}
+{% block title_page %}PAGINA01-RASC{% endblock title_page %}
+
+
+
+{% block conteudo %}
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- Default box -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Editar Quest&atilde;o</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" onclick="history.back()" class="btn btn-tool">
+                                        <i class="fa fa-arrow-left"></i> Voltar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <!-- FORM ACTION -->
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="tx_question">Quest&atilde;o</label>
+                                            <input type="text" class="form-control" id="tx_question" name="tx_question" placeholder="2+2 eh 4">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="cb_validate">Informa&ccedil;&atilde;o</label>
+                                            <select class="form-control" id="cb_validate" name="cb_validate">
+                                                <option>Selecione</option>
+                                                <option value=1>Verdadeiro</option>
+                                                <option value=0>Falso</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                                <button type="button" id="btn_update" name="btn_update" class="btn btn-primary">Atualizar</button>
+                            </div>
+                            <!-- /.card-footer-->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                </div>
+            </div>
+
+        </section>
+        <!-- /.content -->   
+    
+        {% endblock conteudo %}
+
+
+
+{% block renderjs %}
+<script>
+    
+    
+var id_from_flask = {{ id|default("null") }};
+var id_assunto = false;
+
+function load_questao_by_id(id){
+    $.ajax({
+        type: "GET",
+        url: `/api/materia/assunto/questao/${id}`,
+        success: function(e, t, xhr){
+            if(e.error === false){
+                console.log(e.data.correct);
+                var correct_value = e.data.correct === true ? '1' : '0';
+                console.log(correct_value)
+                id_assunto = e.data.assunto_id;
+                $('#tx_question').val(e.data.question);
+                $('#cb_validate').val(correct_value.toString()).change();
+            }
+        },
+        dataType: 'json'
+    })
+}
+
+
+
+$(document).ready(function(){
+    load_questao_by_id(id_from_flask);
+});
+
+
+
+    function update_question(question, correct, id){
+        $.ajax({
+            type: "POST",
+            url: `/api/materia/assunto/questao/${id}/edit`,
+            data: {
+                question: question,
+                correct: correct
+            },
+            success: function(e){
+                window.location.pathname = `/panel/materia/assunto/${id_assunto}/edit`;
+            },
+            dataType: 'json'
+        })
+    };
+
+
+
+    $(document).on('click', '#btn_update', function(e){
+        e.preventDefault();
+        let question = $('#tx_question').val();
+        let correct = $("#cb_validate").val();
+        update_question(question, correct, id_from_flask);
+    });
+
+</script>
+{% endblock renderjs %}

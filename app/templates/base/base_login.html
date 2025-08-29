@@ -1,0 +1,131 @@
+
+<!DOCTYPE html> 
+
+    <!-- Desenvolver pagina Login Aluno/Prof -->
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Q-Acad&ecirc;mico - UFERSA | Entrar</title>
+
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/static/plugins/fontawesome-free/css/all.min.css">
+
+    <!-- Theme style -->
+    <link rel="stylesheet" href="https://adminlte.io/themes/v3/dist/css/adminlte.min.css?v=3.2.0">
+    <!-- <link rel="stylesheet" href="/static/dist/css/adminlte.min.css"> -->
+</head>
+<body class="hold-transition login-page">
+<div class="login-box">
+    <div class="login-logo">
+        <a href="/"><b>Q-Acad&ecirc;mico </b> 0.1</a>
+    </div>
+    <!-- /.login-logo -->
+    <div class="card">
+        <div class="card-body login-card-body">
+            <p class="login-box-msg">Iniciar Sess&atilde;o</p>
+
+            <form action="/static/index3.html" method="post">
+                <div class="input-group mb-3">
+                    <input type="email" class="form-control" placeholder="Email" id="tx_email" name="tx_email">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-envelope"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="password" class="form-control" placeholder="Senha" id="tx_password" name="tx_password">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-lock"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-8">
+                        <div class="icheck-primary">
+                            <input type="checkbox" id="remember">
+                            <label for="remember">
+                                Lembrar de mim
+                            </label>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-4">
+                        <button type="button" id="btn_login" name="btn_login" class="btn btn-primary btn-block">Entrar</button>
+                    </div>
+                    <!-- /.col -->
+                </div>
+            </form>
+
+ 
+
+            <!-- <p class="mb-1">
+                <a href="forgot-password.html">Esqueci minha senha</a>
+            </p> -->
+            <p class="mb-0">
+                <a href="/register" class="text-center">Criar Conta</a>
+            </p>
+        </div>
+        <!-- /.login-card-body -->
+    </div>
+</div>
+<!-- /.login-box -->
+
+<!-- jQuery -->
+<script src="/static/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="/static/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="/static/dist/js/adminlte.min.js"></script>
+<!-- UTILS -->
+<script src="/static/js/utils.js"></script>
+
+<script>
+    function do_login(){
+        let email = $('#tx_email').val();
+        let senha = $('#tx_password').val();
+        var data = {username: email, password: senha};
+        ajaxPost(
+            '/api/user/login',
+            data,
+            function(e){
+                if(e.error === false){
+                    if(e.hasOwnProperty('access_token')){
+                        localStorage.setItem('token', e.access_token);
+                        noty_success_302('Login realizado, redirecionando...', '/');
+                    }else{
+                        notify_error('Sistema falhou carregar token de usu&aacute;rio');
+                    }
+                }else{
+                    notify_error('Sistema falhou realizar login');
+                }
+            },
+            function(x, status, error){
+                var msg_err = `Opa! O sistema retornou erro ! ${x}`
+                notify_error(msg_err);
+            }
+        );
+    }
+
+    $(document).on('click', '#btn_login', function(e){
+        e.preventDefault();
+        do_login()
+    })
+
+    $('input').keypress(function (e) {
+        if (e.which == 13) {
+            do_login()
+        }
+    });
+
+
+   
+</script>
+
+</body>
+</html>

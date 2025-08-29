@@ -1,0 +1,130 @@
+{% set menu_id = "menu-materia-listar" %}
+{% set content_title = "Q-Acadêmico - UFERSA" %}
+{% extends "base/base.html" %}
+{% block title_page %}Q-Acadêmico - UFERSA V 1.0{% endblock title_page %}
+
+
+{% block conteudo %}
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- Default box -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Disciplinas cadastradas:</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" onclick="history.back()" class="btn btn-tool">
+                                        <i class="fa fa-arrow-left"></i> Voltar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <!-- ROWS MODULOS -->
+                                <div class="row dmodulos" name="dmodulos" id="dmodulos">
+
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                                <button type="button" id="btn_new_materia" name="btn_new_materia" class="btn btn-primary">Cadastrar</button>
+                            </div>
+                            <!-- /.card-footer-->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                </div>
+            </div>
+
+        </section>
+        <!-- /.content -->
+    {% endblock conteudo %}
+
+
+{% block renderjs %}
+<script>
+    console.log('hey there');
+    console.log('{{ bb }}');
+
+
+    function append_to_modulo(element){
+        $('.dmodulos').append(`
+        <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+            <div class="card bg-light d-flex flex-fill">
+                <div class="card-header text-muted border-bottom-0">
+                    <!--  ${element.name} -->
+                </div>
+                <div class="card-body pt-0">
+                    <div class="row">
+                        <div class="col-7">
+                            <h2 class="lead"><b>${element.description}</b></h2>
+                        </div>
+                        <div class="col-5 text-center">
+                            <span><i class="${element.icon}"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="text-right">
+                        <a href="/panel/materia/${element.id}/view" class="btn btn-sm btn-primary">
+                            <i class="fas"></i> Visualizar
+                        </a>
+                        <a href="/panel/materia/${element.id}/edit" class="btn btn-sm btn-primary">
+                            <i class="fas"></i> Editar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `);
+    }
+    var token = localStorage.getItem('token');
+
+    function loadMaterias2(){
+        $.ajax({
+            type: "GET",
+            url: "/api/materia/list",
+            headers: {
+                'Authorization': token
+            },
+            success: function(e, t, xhr){
+                e.data.forEach(element => {
+                    append_to_modulo(element)
+                })
+            },
+            dataType: 'json'
+        })
+    }
+
+    function loadMaterias(){
+        ajaxGet(
+            '/api/materia/list',
+            function(e){
+                if(e.error === true){
+                    notify_error('Aplica&ccedil;&atilde;o falhou carregar disciplinas');
+                }else{
+                    e.data.forEach(element => {
+                        append_to_modulo(element)
+                    });
+                }
+            },
+            function(x, status, error){
+                notify_error(x);
+            }
+        )
+    }
+
+    $(document).ready(function(){
+        loadMaterias();
+    });
+
+    $(document).on('click', '#btn_new_materia', function(e){
+        e.preventDefault();
+        window.location.pathname = '/panel/materia/create';
+    });
+</script>
+
+{% endblock renderjs %}

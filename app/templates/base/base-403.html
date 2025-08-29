@@ -1,0 +1,82 @@
+{% set content_title = " Q-Acadêmico V1.0" %}
+{% extends "base/base.html" %}
+{% block title_page %}Q-Acadêmico - V1.0{% endblock title_page %}
+
+
+{% block conteudo %}
+
+
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- Default box -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title ">Sem Permiss&atilde;o</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" onclick="history.back()" class="btn btn-tool">
+                                        <i class="fa fa-arrow-left"></i> Voltar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="error-page">
+                                    <h2 class="headline text-warning"> 403</h2>
+                                    <div class="error-content">
+                                        <h3><i class="fas fa-exclamation-triangle text-warning"></i> Oops! Parece que voc&ecirc; n&atilde;o possui permiss&atilde;o suficiente.</h3>
+                                        <p>
+                                            Desculpe, no momento n&atilde;o conseguimos exibir o que voc&ecirc; est&aacute; procurando. Voc&ecirc; pode tentar <a href="/panel/home">retornar ao in&iacute;cio</a> por enquanto.
+                                        </p>
+                                    </div>
+                
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                                Verifique suas permiss&otilde;es com seu administrador.
+                                <button type="button" id="btn_cancel" name="btn_cancel" onclick="history.back()" class="btn btn-info">Voltar</button>
+                            </div>
+                            <!-- /.card-footer-->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- /.content -->
+    
+        {% endblock conteudo %}
+
+
+        {% block renderjs %}
+        
+        
+        
+        
+        
+        <script>
+
+
+
+$(document).ready(function(){
+    add_bradcumb('403', '/panel1', false);
+
+});
+
+
+
+
+</script>
+        
+        
+        
+        
+        
+        
+        
+        
+        {% endblock renderjs %}

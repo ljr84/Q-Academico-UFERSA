@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+
+ <!-- Desenvolver pagina Criar Usuario Aluno/Prof -->
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Q-Acad&ecirc;mico - UFERSA | Registrar</title>
+
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/static/plugins/fontawesome-free/css/all.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="https://adminlte.io/themes/v3/dist/css/adminlte.min.css?v=3.2.0">
+    <!-- <link rel="stylesheet" href="/static/dist/css/adminlte.min.css"> -->
+</head>
+<body class="hold-transition register-page">
+<div class="register-box">
+    <div class="register-logo">
+        <a href="/"><b>Q-Acad&ecirc;mico - UFERSA</b> Cadastrar professor</a>
+    </div>
+
+    <div class="card">
+        <div class="card-body register-card-body">
+            <p class="login-box-msg">Registrar</p>
+
+            <form action="" method="post">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Usu&aacute;rio" id="tx_username" name="tx_username">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-user"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="email" class="form-control" placeholder="Email" id="tx_email" name="tx_email">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-envelope"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="password" class="form-control" placeholder="Senha" id="tx_password" name="tx_password">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-lock"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Nome" id="tx_name" name="tx_name">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-user"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <button type="button" id="btn_register" name="btn_register" class="btn btn-primary btn-block">Registrar</button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" id="btn_cancel" name="btn_cancel" class="btn btn-danger btn-block">Cancelar</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <span style="display: none;" id="invalid-form" class="error invalid-feedback">Por favor, verifique os dados em vermelho e tente novamente</span>
+                    </div>
+                </div>
+            </form>
+
+            <div class="social-auth-links text-center">
+               
+            </div>
+
+            <a href="/login" class="text-center">J&aacute; sou cadastrado</a>
+        </div>
+        <!-- /.form-box -->
+    </div><!-- /.card -->
+</div>
+<!-- /.register-box -->
+
+<!-- jQuery -->
+<script src="/static/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="/static/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="/static/dist/js/adminlte.min.js"></script>
+<!-- UTILS -->
+<script src="/static/js/utils.js"></script>
+
+<script>
+
+
+
+
+
+
+    function addu(username, email, password, name){
+        ajaxPost('/api/user/public/create', 
+            {
+                username: username,
+                email: email,
+                password: password,
+                name: name
+            }, 
+            function(e){
+                noty_success_302('Usu&aacute;rio criado com sucesso, redirecionando...', '/login');
+            },
+            function(x, status, error){
+                notify_error(x);
+            }
+        );
+    }
+
+    function validate_inputs(){
+        if(validateEmail($('#tx_email').val()) === false){
+            $('#tx_email').addClass('is-invalid');
+            $('.invalid-feedback').toggle();
+            return false;
+        }
+        return true;
+    }
+
+
+
+    $(document).on('click', '#btn_register', function(e){
+        e.preventDefault();
+        let username = $('#tx_username').val();
+        let email = $('#tx_email').val();
+        let senha = $('#tx_password').val();
+        let name = $('#tx_name').val();
+        if(validate_inputs())
+            addu(username, email, senha, name);
+    })
+</script>
+
+</body>
+</html>

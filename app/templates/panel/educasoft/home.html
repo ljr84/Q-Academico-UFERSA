@@ -1,0 +1,65 @@
+{% set bb="1" %}
+{% set menu_id = "menu-home" %}
+{% set content_title = "Q-Acadêmico - UFERSA" %}
+{% extends "base/base.html" %}
+{% block title_page %}Q-Acadêmico{% endblock title_page %}
+
+
+{% block conteudo %}
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- Default box -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title"> In&iacute;cio </h3>
+
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                {% if authenticated == True %}
+                                <p>Bem vindo <strong>{{ user_data.get("name", "") }}</strong></p>
+                                <p>Atalhos:</p>
+                                {% else %}
+                                <p>Bem vindo ao sistema Q-Acad&ecirc;mico - UFERSA!</p>
+                                <p>Atalhos:</p>
+                                <p><a href="/login">Login</a></p>
+                                <p><a href="/register">Registrar</a></p>
+                                {% endif %}
+                                <p><a href="/panel/materia/listar">Disciplinas</a></p>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+
+                            </div>
+                            <!-- /.card-footer-->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                </div>
+            </div>
+
+        </section>
+        <!-- /.content -->
+    {% endblock conteudo %}
+
+
+{% block renderjs %}
+<script>
+    console.log('hey there');
+    console.log('{{ bb }}');
+
+    add_bradcumb('Home', '', true);
+</script>
+
+{% endblock renderjs %}

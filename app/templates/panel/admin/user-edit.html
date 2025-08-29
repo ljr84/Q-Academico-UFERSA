@@ -1,0 +1,246 @@
+{% set menu_id = "menu-admin-users" %}
+
+
+{% set content_title = "Q-Acadêmico - UFERSA" %}
+{% extends "base/base.html" %}
+{% block title_page %}Q-Acadêmico - UFERSA{% endblock title_page %}
+
+
+
+{% block conteudo %}
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- Default box -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Editar Usu&aacute;rio</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" onclick="history.back()" class="btn btn-tool">
+                                        <i class="fa fa-arrow-left"></i> Voltar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <!-- FORM ACTION -->
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="tx_username">Usu&aacute;rio</label>
+                                            <input type="text" class="form-control" id="tx_username" name="tx_username" placeholder="">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="tx_email">E-mail</label>
+                                            <input type="text" class="form-control" id="tx_email" name="tx_email" placeholder="">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="tx_name">Nome</label>
+                                            <input type="text" class="form-control" id="tx_name" name="tx_name" placeholder="">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="cb_group">Grupo</label>
+                                            <select class="form-control" id="cb_group" name="cb_group">
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="cb_status">Status</label>
+                                            <select class="form-control" id="cb_status" name="cb_status">
+                                                <option value="true">Ativo</option>
+                                                <option value="false">Inativo</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="tx_user_type">Tipo</label>
+                                            <input type="text" class="form-control" id="tx_user_type" name="tx_user_type" placeholder="" disabled="">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <h5 class="mt-4 mb-2">Altera&ccedil;&atilde;o de senha - Mantenha em branco para n&atilde;o alterar</h5>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="tx_new_password">Nova Senha</label>
+                                            <input type="text" class="form-control" id="tx_new_password" name="tx_new_password" placeholder="" >
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="tx_new_password_check">Confirmar Nova Senha</label>
+                                            <input type="text" class="form-control" id="tx_new_password_check" name="tx_new_password_check" placeholder="">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                                <button type="button" id="btn_update" name="btn_update" class="btn btn-primary">Atualizar</button>
+                                 <button type="button" id="btn_cancel" name="btn_cancel" onclick="history.back()" class="btn btn-info">Cancelar</button>
+                            </div>
+                            <!-- /.card-footer-->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                </div>
+            </div>
+
+        </section>
+        <!-- /.content -->   
+    
+        {% endblock conteudo %}
+
+
+
+{% block renderjs %}
+<script>
+    
+    
+var id_from_flask = {{ id|default("null") }};
+var id_user = false;
+var token = localStorage.getItem('token');
+
+function load_user_by_id(id){
+    $.ajax({
+        type: "GET",
+        url: `/api/user/${id}`,
+        headers: {
+            'Authorization': token
+        },
+        success: function(e, t, xhr){
+            if(e.error === false){
+                id_user = e.data.id;
+                var tipo_usuario = e.data.group_data.admin === true ? 'Admin': 'Usuario';
+                $('#tx_name').val(e.data.name);
+                $('#tx_email').val(e.data.email);
+                $('#tx_username').val(e.data.username);
+                $('#cb_group').val(e.data.group).change();
+                $('#cb_status').val(e.data.active.toString()).change();
+                $('#tx_user_type').val(tipo_usuario);
+                //$('#cb_validate').val(correct_value.toString()).change();
+            }
+        },
+        dataType: 'json'
+    })
+}
+
+function load_user_groups(){
+    return $.ajax({
+        type: "GET",
+        url: '/api/user/group/list',
+        headers: {
+            'Authorization': token
+        },
+        success: function(e, t, xhr){
+            if(e.error === false){//cb_group
+                e.data.forEach(element => {
+                    $('#cb_group').append(`
+                        <option value="${element.key}">${element.description}</option>
+                    `);
+                })
+            }
+            return e;
+        },
+        dataType: 'json'
+    })
+}
+
+
+function handle_brandcumb(){
+    add_bradcumb('Listar Usu&aacute;rios', '/panel/admin/user/listar', false);
+    add_bradcumb(`[EDITANDO] ID ${id_from_flask}`, '', true);
+}
+
+
+
+$(document).ready(function(){
+    handle_brandcumb()
+    load_user_groups()
+    load_user_by_id(id_from_flask);
+});
+
+
+
+    function update_user(name, email, username, group, status, password){
+        $.ajax({
+            type: "POST",
+            url: `/api/user/${id_from_flask}/edit`,
+            data: {
+                name: name,
+                email: email,
+                username: username,
+                group: group,
+                status: status,
+                password: password
+            },
+            headers: {
+                'Authorization': token
+            },
+            success: function(e){
+                window.location.pathname = `/panel/admin/user/listar`;
+            },
+            dataType: 'json'
+        })
+    };
+
+    function validate_change_password(){
+        let new_password = $('#tx_new_password').val();
+        let new_password_check = $('#tx_new_password_check').val();
+        if(new_password.length > 0){
+            if(new_password != new_password_check){
+                return false;
+            }else{
+                return true;
+            }
+        }else{
+            return null;
+        }
+    }
+
+
+
+    $(document).on('click', '#btn_update', function(e){
+        e.preventDefault();
+        var name = $('#tx_name').val();
+        var email = $('#tx_email').val();
+        var username = $('#tx_username').val();
+        var group = $('#cb_group').val();
+        var status = $('#cb_status').val();
+        let new_password = $('#tx_new_password').val();
+        var pw_check = validate_change_password();
+        if(pw_check === false){
+            notify_error('Verique senha informada');
+        }else{
+            update_user(name, email, username, group, status, new_password);
+        }
+    });
+
+    $(document).on('change', '#tx_new_password', function(e){
+        console.log('mexeu aqui em');
+    });
+
+</script>
+{% endblock renderjs %}
+
+

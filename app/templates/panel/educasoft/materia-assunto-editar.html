@@ -1,0 +1,254 @@
+{% set menu_id = "menu-materia-listar" %}
+
+{% extends "base/base.html" %}
+
+
+{% block rendercss %}
+
+<style>
+
+    .bloco-assunto-description-edit,.bloco-assunto-description-edit{
+        display: none;
+    }
+
+
+</style>
+
+
+{% endblock rendercss %}
+{% block content_title_plus %}
+
+
+
+<h1>
+    <div class="bloco-assunto-description">
+        <div class="bloco-assunto-description-view blocoview">
+            {{ data.description }}
+            <a class="btn btn-info btn-sm btn-edit-assunto-description" href="#">
+                <i class="fas fa-pencil-alt"></i>
+            </a>
+        </div>
+        <div class="bloco-assunto-description-edit blocoedit">
+            <input type="text" name="tx_assunto_description" id="tx_assunto_description" value="{{ data.description }}" />
+            <a class="btn btn-primary btn-sm btn-save-assunto-description" href="#">
+                <i class="fas fa-save"></i>
+            </a>
+            <a class="btn btn-info btn-sm btn-cancel-assunto-description" href="#">
+                <i class="fas fa-window-close"></i>
+            </a>
+        </div>
+    </div>
+</h1>
+
+{% endblock content_title_plus %}
+
+
+
+{% block title_page %}PAGINA01-RASC{% endblock title_page %}
+
+
+
+
+{% block conteudo %}
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- Default box -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title" id="card_title" name="card_title">Quest&otilde;es do assunto ${????assunto}</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" onclick="history.back()" class="btn btn-tool">
+                                        <i class="fa fa-arrow-left"></i> Voltar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <!-- TABLE QUESTOES - ASSUNTOS -->
+                                <table class="table table-striped projects" id="tb_questoes" name="tb_questoes">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Quest&atilde;o</th>
+                                            <th>Resposta</th>
+                                            <th>A&ccedil;&otilde;es</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                                <button type="button" id="btn_new_question" name="btn_new_question" class="btn btn-primary">Nova Quest&atilde;o</button>
+                            </div>
+                            <!-- /.card-footer-->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                </div>
+            </div>
+
+        </section>
+        <!-- /.content -->
+    {% endblock conteudo %}
+
+
+{% block renderjs %}
+<script>
+
+
+var id_from_flask = {{ id|default("null") }};
+
+
+
+function append_to_table(element, index){
+    index += 1;
+    $('#tb_questoes tbody').append(`
+        <tr>
+            <td>${index}#</td>
+            <td>${element.question}</td>
+            <td>${element.correct ? "Verdadeiro" : "Falso"}</td>
+            <td>
+                <!--
+                <a class="btn btn-primary btn-sm" href="/panel/materia/assunto/questao/${element.id}/view">
+                    <i class="fas fa-solid fa-eye"></i>
+                </a> 
+
+                -->
+                <a class="btn btn-info btn-sm" href="/panel/materia/assunto/questao/${element.id}/edit">
+                    <i class="fas fa-pencil-alt"></i>
+                </a>
+                <a class="btn btn-danger btn-sm delete-question" href="#" data-id="${element.id}" data-index="${index}" href2="/panel/materia/assunto/questao/${element.id}/delete">
+                    <i class="fas fa-trash"></i>
+                </a>    
+            </td>
+        </tr>
+    `);
+}
+
+
+
+
+//card_title
+
+
+$(document).on('click', '.delete-question', function(e){
+    e.preventDefault();
+    var id = $(this).attr('data-id');
+    var index = $(this).attr('data-index')
+    if(confirm(`certeza que deseja apagar questao #${index}?`)){
+        $.ajax({
+            type: "DELETE",
+            url: `/api/materia/assunto/questao/${id}`,
+            success: function(e, t, xhr){
+                window.navigation.reload();
+                console.log(`${e}, ${t}, ${xhr}`)
+            },
+            error: function(x, status, error){
+                alert(`Opa! O sistema retornou erro ! -- ${status} -- ${error}`)
+                console.log(`${x} ${status} ${error}`)
+            },
+            dataType: 'json'
+        })
+    }
+})
+
+
+function load_assunto_by_id(id){
+    $.ajax({
+        type: "GET",
+        url: `/api/materia/assunto/${id}`,
+        success: function(e, t, xhr){
+            console.log(`name= ${e.data.name} --- dscr = ${e.data.description}`);
+            if(e.data.disciplina_data){
+                add_bradcumb(e.data.disciplina_data.description, `/panel/materia/${e.data.disciplina_data.id}/view`, false);
+                add_bradcumb(`[EDITANDO] ${e.data.description}`, '', true);
+                $('#card_title').empty().append(`
+                Quest&otilde;es - ${e.data.disciplina_data.description} - ${e.data.disciplina_data.name} - ${e.data.description}
+                `);
+            }
+            e.data.questions.forEach((element, index) => {
+                append_to_table(element, index)
+            })
+        },
+        dataType: 'json'
+    })
+}
+
+
+
+
+
+function update_assunto_dscr(description, id){
+        $.ajax({
+            type: "POST",
+            url: `/api/materia/assunto/${id}/update`,
+            data: {
+                description: description
+            },
+            success: function(e){
+                window.location.pathname = `/panel/materia/assunto/${id}/edit`;
+            },
+            dataType: 'json'
+        })
+    };
+
+
+
+
+
+
+$(document).on('click', '.btn-edit-assunto-name,.btn-edit-assunto-description', function(e){
+        e.preventDefault();
+        console.log($(this));
+        $(this).parent().parent().children('.blocoview').toggle();
+        $(this).parent().parent().children('.blocoedit').toggle();
+        //$('.bloco-assunto-name-view').toggle();
+        //$('.bloco-assunto-name-edit').toggle();
+    })
+
+
+
+
+    $(document).on('click', '.btn-cancel-assunto-name,.btn-cancel-assunto-description', function(e){
+        e.preventDefault();
+        //$('.bloco-assunto-name-view').toggle();
+        //$('.bloco-assunto-name-edit').toggle();
+        $(this).parent().parent().children('.blocoview').toggle();
+        $(this).parent().parent().children('.blocoedit').toggle();
+    })
+
+
+    $(document).on('click', '.btn-save-assunto-name,.btn-save-assunto-description', function(e){
+        e.preventDefault();
+        var assunto_description_new = $('#tx_assunto_description').val();
+        update_assunto_dscr(assunto_description_new, id_from_flask);
+    })
+
+
+
+
+
+
+$(document).ready(function(){
+    load_assunto_by_id({{ id }})
+})
+
+
+
+
+
+    $(document).on('click', '#btn_new_question', function(e){
+        e.preventDefault();
+        window.location.pathname = `/panel/materia/assunto/${id_from_flask}/question/create`;
+    });
+
+</script>
+
+{% endblock renderjs %}

@@ -1,0 +1,261 @@
+{% set menu_id = "menu-materia-listar" %}
+
+
+
+
+{% extends "base/base.html" %}
+
+{% block rendercss %}
+
+<style>
+
+    .bloco-disciplina-name-edit,.bloco-disciplina-description-edit{
+        display: none;
+    }
+
+
+</style>
+
+
+{% endblock rendercss %}
+{% block content_title_plus %}
+
+
+
+
+<h1>
+    <div class="bloco-disciplina-name">
+        <div class="bloco-disciplina-name-view blocoview">
+            {{ data.name }} - {{ data.description }}
+            <a class="btn btn-info btn-sm btn-edit-disciplina" href="#">
+                <i class="fas fa-pencil-alt"></i>
+            </a>
+        </div>
+    </div>
+
+</h1>
+
+
+
+
+
+<!--
+
+{ % set content_title = data.name + " " + data.description % }
+
+-->
+{% endblock content_title_plus %}
+
+
+
+{% block title_page %}PAGINA01-RASC{% endblock title_page %}
+
+
+
+{% block conteudo %}
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- Default box -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Assuntos:</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" onclick="history.back()" class="btn btn-tool">
+                                        <i class="fa fa-arrow-left"></i> Voltar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body table-responsive">
+                                <!-- TABLE ASSUNTOS -->
+                                <table class="table table-striped" id="tb_assuntos" name="tb_assuntos">
+                                    <thead>
+                                        <tr>
+                                            <th>Assunto</th>
+                                            <th>Total</th>
+                                            <th>A&ccedil;&otilde;es</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                                <button type="button" id="btn_new_assunto" name="btn_new_assunto" class="btn btn-primary">Novo Assunto</button>
+                                <button type="button" id="btn_cancel" name="btn_cancel" class="btn btn-info">Disciplinas</button>
+                            </div>
+                            <!-- /.card-footer-->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                </div>
+            </div>
+
+        </section>
+        <!-- /.content -->
+    {% endblock conteudo %}
+
+
+
+{% block renderjs %}
+<script>
+
+
+var id_from_flask = {{ id|default("null") }};
+
+function append_to_table(element){
+    $('#tb_assuntos tbody').append(`
+        <tr>
+            <td>${element.description}</td>
+            <td>${element.total_questions}</td>
+            <td>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default btn-fast-view" data-id="${element.id}">Visualizar</button>
+                    <button type="button" class="btn btn-default dropdown-toggle dropdown-icon" data-toggle="dropdown">
+                        <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="/panel/materia/assunto/${element.id}/view">
+                            Visualizar
+                        </a>
+                        <a class="dropdown-item" href="/panel/materia/assunto/${element.id}/respostas">
+                            Minhas Respostas
+                        </a>
+                        {% if authenticated == True %}
+                            {% if user_data.get('admin', False) == True %}
+                            <a class="dropdown-item" href="/panel/materia/assunto/${element.id}/edit">
+                                Editar
+                            </a>
+                            <a class="dropdown-item delete-assunto" data-descr="${element.description}" data-id="${element.id}" href="#">
+                                Deletar
+                            </a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </td>
+        </tr>
+    `);
+}
+
+$(document).on('click', '.btn-fast-view', function(e){
+    e.preventDefault();
+    var id_data = $(this).attr('data-id');
+    window.location = `/panel/materia/assunto/${id_data}/view`;
+});
+
+
+
+$(document).on('click', '.delete-assunto', function(e){
+    e.preventDefault();
+    var id = $(this).attr('data-id')
+    var descr = $(this).attr('data-descr');
+    if(confirm(`Deseja realmente deletar -- ${descr} -  ??`)){
+        ajaxMe(
+            'DELETE',
+            `/api/materia/assunto/${id}/delete`,
+            {},
+            function(e){
+                noty_success_302(
+                    'Assunto deletado com sucesso!',
+                    `/panel/materia/${id_from_flask}/view`
+                );
+            },
+            function(x, status, error){
+                notify_error(`Aplica&ccedil;&atilde;o falhou excluir assunto - ${x}`)
+            }
+        )
+        // $.ajax({
+        //     type: "DELETE",
+        //     url: `/api/materia/assunto/${id}/delete`,
+        //     success: function(e,t,xhr){
+        //         window.navigation.reload();
+        //     },
+        //     error: function(x,status,error){
+        //         console.log(x);
+        //         var msg_err = x.responseJSON.message ? x.responseJSON.message : error
+        //         alert(`Opa! O sistema retornou erro! -- ${status} -- ${msg_err}`)
+        //     },
+        //     dataType: 'json'
+        // })
+    }
+})
+
+
+
+function load_materia_by_id(id){
+    $.ajax({
+        type: "GET",
+        url: `/api/materia/${id}`,
+        success: function(e, t, xhr){
+            console.log(`name= ${e.data.name} --- dscr = ${e.data.description}`);
+            e.data.assuntos.forEach(element => {
+                append_to_table(element)
+            })
+        },
+        dataType: 'json'
+    })
+}
+
+
+
+function vee(id){
+    return $.ajax({
+        type: "GET",
+        url: `/api/materia/${id}`,
+        async: false,
+        success: function(e){
+            return e
+        }
+    });
+}
+
+
+
+function update_disciplina(description, name, id){
+        $.ajax({
+            type: "POST",
+            url: `/api/materia/${id}/edit`,
+            data: {
+                description: description,
+                name: name
+            },
+            success: function(e){
+                window.location.pathname = `/panel/materia/${id}/view`;
+            },
+            dataType: 'json'
+        })
+    };
+
+
+
+$(document).on('click', '.btn-edit-disciplina', function(e){
+    e.preventDefault();
+    window.location = `/panel/materia/${id_from_flask}/edit`;
+})
+
+
+
+$(document).ready(function(){
+    load_materia_by_id({{ id }})
+    add_bradcumb("{{ data.description }}", '', true);
+})
+
+    $(document).on('click', '#btn_new_assunto', function(e){
+        e.preventDefault();
+        window.location.pathname = `/panel/materia/${id_from_flask}/assunto/create`;
+    });
+
+    $(document).on('click', '#btn_cancel', function(e){
+        e.preventDefault();
+        window.location = '/panel/materia/listar'
+    })
+</script>
+
+{% endblock renderjs %}

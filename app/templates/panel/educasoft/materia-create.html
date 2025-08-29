@@ -1,0 +1,240 @@
+{% set menu_id = "menu-materia-create" %}
+
+{% set content_title = "Q-Acadêmico" %}
+{% extends "base/base.html" %}
+{% block title_page %}Q-Acadêmico{% endblock title_page %}
+
+
+{% block rendercss %}
+
+<style>
+    #iconModal .modal-body i {
+  cursor: pointer;
+}
+
+#iconModal .modal-body i.active {
+  background-color: #007bff;
+  color: #fff;
+}
+
+
+#iconModal .modal-body i.selected {
+  border: 2px solid #007bff;
+  border-radius: 4px;
+}
+
+</style>
+
+{% endblock rendercss %}
+
+
+{% block conteudo %}
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- Default box -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Dados Nova Materia</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" onclick="history.back()" class="btn btn-tool">
+                                        <i class="fa fa-arrow-left"></i> Voltar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <!-- FORM ACTION -->
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="tx_name">Cod Disciplina:</label>
+                                            <input type="text" class="form-control" id="tx_name" name="tx_name" placeholder="N. Materia:">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="tx_description">Nome:</label>
+                                            <input type="text" class="form-control" id="tx_description" name="tx_description" placeholder="Ex.: CALCULOI">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <span>Icone: <i id="ic_selected" name="ic_selected" class="fas fa-user"></i></span>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#iconModal">
+                                            Selecionar Ícone
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                                <button type="button" id="btn_create" name="btn_create" class="btn btn-primary">Cadastrar</button>
+                                <button type="button" id="btn_cancel" name="btn_cancel" onclick="history.back()" class="btn btn-info">Cancelar</button>
+                            </div>
+                            <!-- /.card-footer-->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                </div>
+            </div>
+
+        </section>
+        <!-- /.content -->    
+
+<!-- MODAL SELECIONAR ICONE -->
+
+<div class="modal fade" id="iconModal" tabindex="-1" role="dialog" aria-labelledby="iconModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="iconModalLabel">Selecionar Ícone</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<!-- Lista de ícones -->
+				<ul class="list-unstyled">
+					<li><i class="fas fa-user" id="icselect" name="icselect" data-icon="fas fa-user"></i></li>
+					<li><i class="fas fa-envelope" id="icselect" name="icselect"  data-icon="fas fa-envelope"></i></li>
+					<!-- Adicione mais ícones aqui -->
+				</ul>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+				<button type="button" class="btn btn-primary" id="saveIconBtn">Salvar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- //MODAL SELECIONAR ICONE -->
+
+        {% endblock conteudo %}
+
+
+{% block renderjs %}
+<script>
+
+    // function create_materia(name, icon, description){
+    //     ajaxPost(
+    //         '/api/materia/create',
+    //         {
+    //             name: name,
+    //             icon: icon,
+    //             description: description
+    //         },
+    //         function(e){
+    //             if(e.error===true){
+    //                 if(e.hasOwnProperty('code')){
+    //                     if(e.code == 'EXISTS'){
+    //                         noty_info_302(
+    //                             e.message, 
+    //                             `/panel/materia/${e.id}/view`
+    //                         );
+    //                     }else{
+    //                         notify_error('falhou');
+    //                     }
+    //                 }else{
+    //                     notify_error('falhou2');
+    //                 }
+    //             }else{
+    //                 noty_success_302(
+    //                     'Disciplina cadastrada com sucesso, redirecionando...',
+    //                     `/panel/materia/${e.data.id}/view`
+    //                 )
+    //             }
+    //         },
+    //         function(x, status, error)
+    //     )
+    // }
+
+    function create_materia(name, icon, description){
+        $.ajax({
+            type: "POST",
+            url: '/api/materia/create',
+            data: {
+                name: name,
+                icon: icon,
+                description: description
+            },
+            success: function(e){
+                if(e.error===true){
+                    if(e.hasOwnProperty('code')){
+                        if(e.code == 'EXISTS'){
+                            noty_info_302(
+                                e.message, 
+                                `/panel/materia/${e.id}/view`
+                            );
+                        }else{
+                            notify_error('falhou');
+                        }
+                    }else{
+                        notify_error('falhou2');
+                    }
+                }else{
+                    noty_success_302(
+                        'Disciplina cadastrada com sucesso, redirecionando...',
+                        `/panel/materia/${e.data.id}/view`
+                    )
+                }
+            },
+            error: function(x, status, error){
+                let e = x.responseJSON;
+                if(e.error===true){
+                    if(e.hasOwnProperty('code')){
+                        if(e.code == 'EXISTS'){
+                            noty_info_302(
+                                e.message, 
+                                `/panel/materia/${e.id}/view`
+                            );
+                        }else{
+                            notify_error('falhou');
+                        }
+                    }else{
+                        notify_error('falhou2');
+                    }
+                }
+            },
+            dataType: 'json'
+        })
+    };
+
+    $(document).on('click', '#btn_create', function(e){
+        e.preventDefault();
+        let name = $('#tx_name').val();
+        let icon = document.querySelector('#ic_selected').getAttribute('class');
+        let description = $('#tx_description').val();
+        create_materia(name, icon, description)
+    });
+
+    document.querySelectorAll('#iconModal .modal-body i').forEach(function(icon) {
+        icon.addEventListener('click', function() {
+            document.querySelectorAll('#iconModal .modal-body i').forEach(function(icon) {
+                icon.classList.remove('selected');
+            });
+            this.classList.add('selected');
+        });
+    });
+
+
+    document.getElementById('saveIconBtn').addEventListener('click', function() {
+        var selectedIcon = document.querySelector('.selected#icselect')
+        var iconClass = selectedIcon.getAttribute('data-icon');
+        document.querySelector('#ic_selected').setAttribute('class', iconClass);
+
+        console.log(`clicou no save com icone == ${iconClass}`);
+        
+        $('#iconModal').modal('hide');
+    });
+
+
+</script>
+{% endblock renderjs %}

@@ -1,0 +1,199 @@
+{% set menu_id = "menu-materia-create" %}
+
+{% set content_title = "Q-Acadêmico" %}
+{% extends "base/base.html" %}
+{% block title_page %}Q-Acadêmico{% endblock title_page %}
+
+
+{% block rendercss %}
+
+<style>
+    #iconModal .modal-body i {
+  cursor: pointer;
+}
+
+#iconModal .modal-body i.active {
+  background-color: #007bff;
+  color: #fff;
+}
+
+
+#iconModal .modal-body i.selected {
+  border: 2px solid #007bff;
+  border-radius: 4px;
+}
+
+</style>
+
+{% endblock rendercss %}
+
+
+{% block conteudo %}
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- Default box -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Dados Materia</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" onclick="history.back()" class="btn btn-tool">
+                                        <i class="fa fa-arrow-left"></i> Voltar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <!-- FORM ACTION -->
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="tx_name">Numeracao:</label>
+                                            <input type="text" class="form-control" id="tx_name" name="tx_name" placeholder="N. Materia:">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="tx_description">Nome:</label>
+                                            <input type="text" class="form-control" id="tx_description" name="tx_description" placeholder="Ex.: CALCULOI">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <span>Icone: <i id="ic_selected" name="ic_selected" class=""></i></span>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#iconModal">
+                                            Selecionar Ícone
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                                <button type="button" id="btn_update" name="btn_update" class="btn btn-primary">Atualizar</button>
+                                <button type="button" id="btn_cancel" name="btn_cancel" onclick="history.back()" class="btn btn-info">Cancelar</button>
+                            </div>
+                            <!-- /.card-footer-->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                </div>
+            </div>
+
+        </section>
+        <!-- /.content -->    
+
+<!-- MODAL SELECIONAR ICONE -->
+
+<div class="modal fade" id="iconModal" tabindex="-1" role="dialog" aria-labelledby="iconModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="iconModalLabel">Selecionar Ícone</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Lista de ícones -->
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-user" id="icselect" name="icselect" data-icon="fas fa-user"></i></li>
+                    <li><i class="fas fa-envelope" id="icselect" name="icselect"  data-icon="fas fa-envelope"></i></li>
+                    <!-- Adicione mais ícones aqui -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-primary" id="saveIconBtn">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- //MODAL SELECIONAR ICONE -->
+
+        {% endblock conteudo %}
+
+
+{% block renderjs %}
+<script>
+
+    var id_from_flask = {{ id|default("null") }};
+
+
+    function load_materia_by_id(id){
+        ajaxGet(
+            `/api/materia/${id}`,
+            function(e){
+                if(e.error===false){
+                    $('#tx_name').val(e.data.name);
+                    $('#tx_description').val(e.data.description);
+                    $('#ic_selected').addClass(e.data.icon);
+                }
+            }
+        )
+    }
+
+
+    function update_materia(id, name, icon, description){
+        ajaxPost(
+            `/api/materia/${id}/edit`,
+            {
+                name: name,
+                icon: icon,
+                description: description
+            },
+            function(e){
+                if(e.error === false){
+                    noty_success_302('Disciplina atualizada com sucesso, redirecionando...', `/panel/materia/${id}/view`)
+                }else{
+                    notify_error("Aplicacao falhou atualizar disciplina");
+                }
+            },
+            function(x){
+                notify_error(x)
+            }
+        )
+    }
+
+
+    $(document).on('click', '#btn_update', function(e){
+        e.preventDefault();
+        let name = $('#tx_name').val();
+        let icon = document.querySelector('#ic_selected').getAttribute('class');
+        let description = $('#tx_description').val();
+        update_materia(id_from_flask, name, icon, description)
+    });
+
+    document.querySelectorAll('#iconModal .modal-body i').forEach(function(icon) {
+        icon.addEventListener('click', function() {
+            document.querySelectorAll('#iconModal .modal-body i').forEach(function(icon) {
+                icon.classList.remove('selected');
+            });
+            this.classList.add('selected');
+        });
+    });
+
+
+    document.getElementById('saveIconBtn').addEventListener('click', function() {
+        var selectedIcon = document.querySelector('.selected#icselect')
+        var iconClass = selectedIcon.getAttribute('data-icon');
+        document.querySelector('#ic_selected').setAttribute('class', iconClass);
+
+        console.log(`clicou no save com icone == ${iconClass}`);
+        
+        $('#iconModal').modal('hide');
+    });
+
+    $(document).ready(function(){
+        load_materia_by_id(id_from_flask);
+    })
+
+
+</script>
+{% endblock renderjs %}

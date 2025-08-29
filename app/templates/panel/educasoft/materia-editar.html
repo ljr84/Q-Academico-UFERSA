@@ -1,0 +1,276 @@
+{% set menu_id = "menu-materia-listar" %}
+
+
+
+
+{% extends "base/base.html" %}
+
+{% block rendercss %}
+
+<style>
+
+    .bloco-disciplina-name-edit,.bloco-disciplina-description-edit{
+        display: none;
+    }
+
+
+</style>
+
+
+{% endblock rendercss %}
+{% block content_title_plus %}
+
+
+
+
+<h1>
+    <div class="bloco-disciplina-name">
+        <div class="bloco-disciplina-name-view blocoview">
+            {{ data.name }}
+            <a class="btn btn-info btn-sm btn-edit-disciplina-name" href="#">
+                <i class="fas fa-pencil-alt"></i>
+            </a>
+        </div>
+        <div class="bloco-disciplina-name-edit blocoedit">
+            <input type="text" name="tx_disciplina_name" id="tx_disciplina_name" value="{{ data.name }}" />
+            <a class="btn btn-primary btn-sm btn-save-disciplina-name" href="#">
+                <i class="fas fa-save"></i>
+            </a>
+            <a class="btn btn-info btn-sm btn-cancel-disciplina-name" href="#">
+                <i class="fas fa-window-close"></i>
+            </a>
+        </div>
+    </div>
+
+</h1>
+
+
+<h2>
+    <div class="bloco-disciplina-description">
+        <div class="bloco-disciplina-description-view blocoview">
+            {{ data.description }}
+            <a class="btn btn-info btn-sm btn-edit-disciplina-description" href="#">
+                <i class="fas fa-pencil-alt"></i>
+            </a>
+        </div>
+        <div class="bloco-disciplina-description-edit blocoedit">
+            <input type="text" name="tx_disciplina_description" id="tx_disciplina_description" value="{{ data.description }}" />
+            <a class="btn btn-primary btn-sm btn-save-disciplina-description" href="#">
+                <i class="fas fa-save"></i>
+            </a>
+            <a class="btn btn-info btn-sm btn-cancel-disciplina-description" href="#">
+                <i class="fas fa-window-close"></i>
+            </a>
+        </div>
+    </div>
+
+</h2>
+
+
+
+<!--
+
+{ % set content_title = data.name + " " + data.description % }
+
+-->
+{% endblock content_title_plus %}
+
+
+
+{% block title_page %}PAGINA01-RASC{% endblock title_page %}
+
+
+
+{% block conteudo %}
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- Default box -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Assuntos:</h3>
+
+                                <div class="card-tools">
+                                    <button type="button" onclick="history.back()" class="btn btn-tool">
+                                        <i class="fa fa-arrow-left"></i> Voltar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <!-- TABLE ASSUNTOS -->
+                                <table class="table table-striped projects" id="tb_assuntos" name="tb_assuntos">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Assunto</th>
+                                            <th>Total Perguntas</th>
+                                            <th>Visualização - Inserção - Exclusão</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                                <button type="button" id="btn_new_assunto" name="btn_new_assunto" class="btn btn-primary">Novo Assunto</button>
+                            </div>
+                            <!-- /.card-footer-->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                </div>
+            </div>
+
+        </section>
+        <!-- /.content -->
+    {% endblock conteudo %}
+
+
+
+{% block renderjs %}
+<script>
+
+
+var id_from_flask = {{ id|default("null") }};
+
+function append_to_table(element){
+    $('#tb_assuntos tbody').append(`
+        <tr>
+            <td>#</td>
+            <td>${element.description}</td>
+            <td>${element.total_questions}</td>
+            <td>
+                <a class="btn btn-primary btn-sm" href="/panel/materia/assunto/${element.id}/view">
+                    <i class="fas fa-solid fa-eye"></i>
+                </a>
+                <a class="btn btn-info btn-sm" href="/panel/materia/assunto/${element.id}/edit">
+                    <i class="fas fa-pencil-alt"></i>
+                </a>
+                <a class="btn btn-danger btn-sm delete-assunto" data-descr="${element.description}" data-id="${element.id}" href="#">
+                    <i class="fas fa-trash"></i>
+                </a>    
+            </td>
+        </tr>
+    `);
+}
+
+
+
+$(document).on('click', '.delete-assunto', function(e){
+    e.preventDefault();
+    var id = $(this).attr('data-id')
+    var descr = $(this).attr('data-descr');
+    if(confirm(`Deseja realmente deletar -- ${descr} -  ??`)){
+        $.ajax({
+            type: "DELETE",
+            url: `/api/materia/assunto/${id}/delete`,
+            success: function(e,t,xhr){
+                window.navigation.reload();
+            },
+            error: function(x,status,error){
+                console.log(x);
+                var msg_err = x.responseJSON.message ? x.responseJSON.message : error
+                alert(`Opa! O sistema retornou erro! -- ${status} -- ${msg_err}`)
+            },
+            dataType: 'json'
+        })
+    }
+})
+
+
+
+function load_materia_by_id(id){
+    $.ajax({
+        type: "GET",
+        url: `/api/materia/${id}`,
+        success: function(e, t, xhr){
+            console.log(`name= ${e.data.name} --- dscr = ${e.data.description}`);
+            e.data.assuntos.forEach(element => {
+                append_to_table(element)
+            })
+        },
+        dataType: 'json'
+    })
+}
+
+
+
+function vee(id){
+    return $.ajax({
+        type: "GET",
+        url: `/api/materia/${id}`,
+        async: false,
+        success: function(e){
+            return e
+        }
+    });
+}
+
+
+
+function update_disciplina(description, name, id){
+        $.ajax({
+            type: "POST",
+            url: `/api/materia/${id}/edit`,
+            data: {
+                description: description,
+                name: name
+            },
+            success: function(e){
+                window.location.pathname = `/panel/materia/${id}/view`;
+            },
+            dataType: 'json'
+        })
+    };
+
+
+
+
+
+
+$(document).on('click', '.btn-edit-disciplina-name,.btn-edit-disciplina-description', function(e){
+        e.preventDefault();
+        console.log($(this));
+        $(this).parent().parent().children('.blocoview').toggle();
+        $(this).parent().parent().children('.blocoedit').toggle();
+        //$('.bloco-disciplina-name-view').toggle();
+        //$('.bloco-disciplina-name-edit').toggle();
+    })
+
+
+
+
+    $(document).on('click', '.btn-cancel-disciplina-name,.btn-cancel-disciplina-description', function(e){
+        e.preventDefault();
+        //$('.bloco-disciplina-name-view').toggle();
+        //$('.bloco-disciplina-name-edit').toggle();
+        $(this).parent().parent().children('.blocoview').toggle();
+        $(this).parent().parent().children('.blocoedit').toggle();
+    })
+
+
+    $(document).on('click', '.btn-save-disciplina-name,.btn-save-disciplina-description', function(e){
+        e.preventDefault();
+        var disciplina_name_new = $('#tx_disciplina_name').val();
+        var disciplina_description_new = $('#tx_disciplina_description').val();
+        update_disciplina(disciplina_description_new, disciplina_name_new, id_from_flask);
+    })
+
+
+$(document).ready(function(){
+    load_materia_by_id({{ id }})
+    add_bradcumb("{{ data.description }}", '', true);
+})
+
+    $(document).on('click', '#btn_new_assunto', function(e){
+        e.preventDefault();
+        window.location.pathname = `/panel/materia/${id_from_flask}/assunto/create`;
+    });
+</script>
+
+{% endblock renderjs %}
