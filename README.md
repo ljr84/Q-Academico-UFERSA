@@ -23,6 +23,7 @@ Entre na pasta do projeto
 
 # Demonstração de uso; 
 
+<img width="1884" height="865" alt="image" src="https://github.com/user-attachments/assets/51af30bf-7441-49cb-8446-1758c80db5c5" />
 
 
 Contato para duvidas os sugestões: samara.nascimento@ufersa.edu.br | 
